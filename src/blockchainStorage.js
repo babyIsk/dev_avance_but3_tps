@@ -2,10 +2,13 @@ import {readFile, writeFile} from 'node:fs/promises'
 import {getDate, monSecret} from "./divers.js";
 import {NotFoundError} from "./errors.js";
 import {createHash} from 'node:crypto'
+import { resolve } from 'node:path';
+import { v4 as uuidv4 } from 'uuid';
+
 
 
 /* Chemin de stockage des blocks */
-const path = ''
+const path = './data/blockchain.json'
 
 /**
  * Mes définitions
@@ -23,7 +26,22 @@ const path = ''
  * @return {Promise<any>}
  */
 export async function findBlocks() {
-    // A coder
+    try {
+        const filePath = resolve(path);
+        const contents = await readFile(filePath, { encoding: 'utf8' }, (err, data) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            console.log(data);
+        });
+
+        const blockchain = JSON.parse(contents)
+        console.log(contents);
+        return blockchain;
+    } catch (err) {
+        console.error(err.message);
+    }
 }
 
 /**
@@ -31,24 +49,45 @@ export async function findBlocks() {
  * @param partialBlock
  * @return {Promise<Block[]>}
  */
-export async function findBlock(partialBlock) {
-    // A coder
-}
 
+export async function findBlock(partialBlock) {
+
+}
 /**
  * Trouve le dernier block de la chaine
  * @return {Promise<Block|null>}
  */
 export async function findLastBlock() {
     // A coder
+
 }
 
 /**
  * Creation d'un block depuis le contenu json
  * @param contenu
- * @return {Promise<Block[]>}
+ * @return {Promise<{hello: string}>}
  */
 export async function createBlock(contenu) {
     // A coder
+    console.log(uuidv4())
+    console.log(getDate())
+    console.log(contenu.nom)
+    console.log(contenu.somme)
+
+    const blockchain = await findBlocks();
+    const newId = uuidv4();
+    const currentDate = getDate();
+    const newBlock = {
+        id: newId,
+        nom: contenu.nom,
+        don: contenu.don,
+        date: currentDate,
+        hash: '',
+    };
+
+    console.log(newBlock)
+    blockchain.push(newBlock);
+    await writeFile(path, JSON.stringify(blockchain, null, 2), 'utf-8');
+    return blockchain;
 }
 

@@ -59,7 +59,12 @@ export async function findBlock(partialBlock) {
  */
 export async function findLastBlock() {
     // A coder
-
+    const blockchain = await findBlocks();
+    if (blockchain.length === 0) {
+        return null;
+    }
+    console.log(blockchain)
+    return blockchain[blockchain.length - 1];
 }
 
 /**
@@ -84,6 +89,14 @@ export async function createBlock(contenu) {
         date: currentDate,
         hash: '',
     };
+
+    // Pour le hash du bloc précédent s'il existe
+    const lastBlock = await findLastBlock();
+    if (lastBlock) {
+        const previousBlockString = JSON.stringify(lastBlock);
+        const hash = createHash('sha256').update(previousBlockString).digest('hex');
+        newBlock.hash = hash;
+    }
 
     console.log(newBlock)
     blockchain.push(newBlock);
